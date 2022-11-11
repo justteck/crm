@@ -118,20 +118,43 @@ const openCloseModal = () => {
     overlay.classList.add('active');
   });
 
-  modalWrapper.addEventListener('click', event => event.stopPropagation());
+  overlay.addEventListener('click', e => {
+    const target = e.target;
 
-  modalCloseBtn.addEventListener('click', () => {
-    overlay.classList.remove('active');
+    if (target.matches('.overlay') ||
+        target.closest('.modal__close')) {
+      overlay.classList.remove('active');
+    }
   });
+};
 
-  overlay.addEventListener('click', () => {
-    overlay.classList.remove('active');
+const deleteGoods = () => {
+  const table = document.querySelector('.table__body');
+
+  table.addEventListener('click', e => {
+    const target = e.target;
+
+    if (target.matches('.table__btn_del')) {
+      const currentGoods = target.closest('tr');
+      const goodsId = +currentGoods.
+        querySelector('.table__cell-id').
+        parentElement.dataset.id;
+      const goodsIndexInDB = arr.findIndex(goods => goods.id === goodsId);
+
+      if (goodsIndexInDB >= 0) {
+        arr.splice(goodsIndexInDB, 1);
+      }
+
+      currentGoods.remove();
+      console.table('DB: ', arr);
+    }
   });
 };
 
 const init = () => {
   renderGoods(arr);
   openCloseModal();
+  deleteGoods();
 };
 
 init();
