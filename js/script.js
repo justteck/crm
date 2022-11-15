@@ -79,6 +79,43 @@ const createRow =
     return tr;
   };
 
+const modalSetTotalPrice = () => {
+  const totalPriceField = modalForm.total;
+  const count = modalForm.count;
+  const price = modalForm.price;
+  const discount = modalForm.discount_count;
+  const discountCheckbox = modalForm.discount;
+
+  const setTotalPrice = () => {
+    const discountCount = discount.value ? discount.value : 0;
+
+    const totalPrice =
+      (price.value * count.value * (1 - (discountCount / 100)).
+        toFixed(2));
+
+    totalPriceField.textContent = `$ ${totalPrice}`;
+  };
+
+  count.addEventListener('blur', setTotalPrice);
+  price.addEventListener('blur', setTotalPrice);
+  discount.addEventListener('blur', setTotalPrice);
+  discountCheckbox.addEventListener('click', setTotalPrice);
+};
+
+const countTotalPricePage = () => {
+  const prices = [...tableBody.querySelectorAll('td:nth-child(7)')].
+    map(price => +price.textContent.slice(1));
+
+  let totalPricePage = 0;
+
+  if (prices.length !== 0) {
+    totalPricePage = prices.reduce((prevPrice, currPrice) =>
+      prevPrice + currPrice).toFixed(2);
+  }
+
+  totalPrice.textContent = `$ ${totalPricePage}`;
+};
+
 const addGoods = (goods) => {
   const addGoodsToDB = (goods) => {
     dataBase.push(goods);
@@ -116,42 +153,10 @@ const deleteGoods = () => {
       }
 
       currentGoods.remove();
+      countTotalPricePage();
       console.table('DB: ', dataBase);
     }
   });
-};
-
-const modalSetTotalPrice = () => {
-  const totalPriceField = modalForm.total;
-  const count = modalForm.count;
-  const price = modalForm.price;
-  const discount = modalForm.discount_count;
-  const discountCheckbox = modalForm.discount;
-
-  const setTotalPrice = () => {
-    const discountCount = discount.value ? discount.value : 0;
-
-    const totalPrice =
-      (price.value * count.value * (1 - (discountCount / 100)).
-        toFixed(2));
-
-    totalPriceField.textContent = `$ ${totalPrice}`;
-  };
-
-  count.addEventListener('blur', setTotalPrice);
-  price.addEventListener('blur', setTotalPrice);
-  discount.addEventListener('blur', setTotalPrice);
-  discountCheckbox.addEventListener('click', setTotalPrice);
-};
-
-const countTotalPricePage = () => {
-  const prices = [...tableBody.querySelectorAll('td:nth-child(7)')].
-    map(price => +price.textContent.slice(1));
-
-  const totalPricePage = prices.reduce((prevPrice, currPrice) =>
-    prevPrice + currPrice).toFixed(2);
-
-  totalPrice.textContent = `$ ${totalPricePage}`;
 };
 
 const modalControlDiscount = () => {
