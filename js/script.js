@@ -103,17 +103,19 @@ const modalSetTotalPrice = () => {
 };
 
 const countTotalPricePage = () => {
-  const prices = [...tableBody.querySelectorAll('td:nth-child(7)')].
-    map(price => +price.textContent.slice(1));
+  const price = [...tableBody.querySelectorAll('td:nth-child(7)')].
+    map(price => +price.textContent.slice(1)).
+    reduce((prevPrice, currPrice) => prevPrice + currPrice).
+    toFixed(2);
 
-  let totalPricePage = 0;
+  // let totalPricePage = 0;
 
-  if (prices.length !== 0) {
-    totalPricePage = prices.reduce((prevPrice, currPrice) =>
-      prevPrice + currPrice).toFixed(2);
-  }
+  // if (prices.length !== 0) {
+  //   totalPricePage = prices.reduce((prevPrice, currPrice) =>
+  //     prevPrice + currPrice).toFixed(2);
+  // }
 
-  totalPrice.textContent = `$ ${totalPricePage}`;
+  totalPrice.textContent = `$ ${price}`;
 };
 
 const addGoods = (goods) => {
