@@ -1,131 +1,100 @@
 'use strict';
 
-const modalTitle = document.querySelector('.modal__title');
-const modalWrapper = document.querySelector('.modal');
-const modalForm = document.querySelector('.modal__form');
-const modalIsDiscountCheckbox = document.querySelector('.modal__checkbox');
-const modalDiscountCount = document.querySelector('.modal__input_discount');
-const modalCloseBtn = document.querySelector('.modal__close');
+// const renderGoods = (goodsArr) => {
+//   const tableBody = document.querySelector('.table__body');
+
+//   let nextRowNumber = tableBody.querySelectorAll('tr').length + 1;
+
+//   for (const goods of goodsArr) {
+//     const currentGoods = createRow(goods);
+
+//     // Добавляем номер строки в таблице
+//     currentGoods.querySelector('td').textContent = nextRowNumber;
+//     nextRowNumber += 1;
+
+//     tableBody.append(currentGoods);
+//   }
+// };
+
+const dataBase = [];
+
 const overlay = document.querySelector('.overlay');
+const modalForm = document.querySelector('.modal__form');
+const newGoodsId = document.querySelector('.vendor-code__id');
+const modalDiscountCheckbox = document.querySelector('.modal__checkbox');
+const discountField = modalDiscountCheckbox.nextElementSibling;
+
+const tableBody = document.querySelector('.table__body');
+const totalPrice = document.querySelector('.cms__total-price');
 
 const btnAddGoods = document.querySelector('.panel__add-goods');
 
-const arr = [
-  {
-    "id": 1,
-    "title": "Смартфон Xiaomi 11T 8/128GB",
-    "price": 27000,
-    "description": "Смартфон Xiaomi 11T – это представитель флагманской линейки, выпущенной во второй половине 2021 года. И он полностью соответствует такому позиционированию, предоставляя своим обладателям возможность пользоваться отличными камерами, ни в чем себя не ограничивать при запуске игр и других требовательных приложений.",
-    "category": "mobile-phone",
-    "discont": false,
-    "count": 3,
-    "units": "шт",
-    "images": {
-      "small": "img/smrtxiaomi11t-m.jpg",
-      "big": "img/smrtxiaomi11t-b.jpg"
-    }
-  },
-  {
-    "id": 2,
-    "title": "Радиоуправляемый автомобиль Cheetan",
-    "price": 4000,
-    "description": "Внедорожник на дистанционном управлении. Скорость 25км/ч. Возраст 7 - 14 лет",
-    "category": "toys",
-    "discont": 5,
-    "count": 1,
-    "units": "шт",
-    "images": {
-      "small": "img/cheetancar-m.jpg",
-      "big": "img/cheetancar-b.jpg"
-    }
-  },
-  {
-    "id": 3,
-    "title": "ТВ приставка MECOOL KI",
-    "price": 12400,
-    "description": "Всего лишь один шаг сделает ваш телевизор умным, Быстрый и умный MECOOL KI PRO, прекрасно спроектированный, сочетает в себе прочный процессор Cortex-A53 с чипом Amlogic S905D",
-    "category": "tv-box",
-    "discont": 15,
-    "count": 4,
-    "units": "шт",
-    "images": {
-      "small": "img/tvboxmecool-m.jpg",
-      "big": "img/tvboxmecool-b.jpg"
-    }
-  },
-  {
-    "id": 4,
-    "title": "Витая пара PROConnect 01-0043-3-25",
-    "price": 22,
-    "description": "Витая пара Proconnect 01-0043-3-25 является сетевым кабелем с 4 парами проводов типа UTP, в качестве проводника в которых используется алюминий, плакированный медью CCA. Такая неэкранированная витая пара с одножильными проводами диаметром 0.50 мм широко применяется в процессе сетевых монтажных работ. С ее помощью вы сможете обеспечить развертывание локальной сети в домашних условиях или на предприятии, объединить все необходимое вам оборудование в единую сеть.",
-    "category": "cables",
-    "discont": false,
-    "count": 420,
-    "units": "v",
-    "images": {
-      "small": "img/lan_proconnect43-3-25.jpg",
-      "big": "img/lan_proconnect43-3-25-b.jpg"
+const modalConfigFields = () => {
+  const elements = modalForm.firstElementChild.elements;
+
+  for (const element of elements) {
+    if (element.type !== 'checkbox' && element.type !== 'file') {
+      element.required = true;
     }
   }
-];
 
-const createRow = ({id, title, category, units, count, price}) => {
-  const tr = document.createElement('tr');
-
-  const tableRow = `
-    <td class="table__cell"></td>
-    <td class="table__cell table__cell_left 
-    table__cell_name" data-id="${id}">
-      <span class="table__cell-id">id: ${id}</span>
-      ${title}
-    </td>
-    <td class="table__cell table__cell_left">${category}</td>
-    <td class="table__cell">${units}</td>
-    <td class="table__cell">${count}</td>
-    <td class="table__cell">$${price}</td>
-    <td class="table__cell">$${count * price}</td>
-    <td class="table__cell table__cell_btn-wrapper">
-      <button class="table__btn table__btn_pic"></button>
-      <button class="table__btn table__btn_edit"></button>
-      <button class="table__btn table__btn_del"></button>
-    </td>
-  `;
-
-  tr.insertAdjacentHTML('afterbegin', tableRow);
-  return tr;
+  elements.discount_count.type = 'number';
+  elements.count.type = 'number';
+  elements.price.type = 'number';
 };
 
-const renderGoods = (goodsArr) => {
-  const tableBody = document.querySelector('.table__body');
+const generateId = () => Date.now();
 
-  let nextRowNumber = tableBody.querySelectorAll('tr').length + 1;
+const createRow =
+  ({id,
+    name: title,
+    category,
+    units,
+    count,
+    price,
+    discount_count: discountCount = 0}) => {
+    const tr = document.createElement('tr');
+    const resultDiscount = 1 - (discountCount / 100);
+    const resultPrice = (price * resultDiscount).toFixed(2);
+    const tableRow = `
+      <td class="table__cell"></td>
+      <td class="table__cell table__cell_left 
+      table__cell_name" data-id="${id}">
+        <span class="table__cell-id">id: ${id}</span>
+        ${title}
+      </td>
+      <td class="table__cell table__cell_left">${category}</td>
+      <td class="table__cell">${units}</td>
+      <td class="table__cell">${count}</td>
+      <td class="table__cell">$${resultPrice}</td>
+      <td class="table__cell">$${count * resultPrice}</td>
+      <td class="table__cell table__cell_btn-wrapper">
+        <button class="table__btn table__btn_pic"></button>
+        <button class="table__btn table__btn_edit"></button>
+        <button class="table__btn table__btn_del"></button>
+      </td>
+    `;
 
-  for (const goods of goodsArr) {
-    const currentGoods = createRow(goods);
+    tr.insertAdjacentHTML('afterbegin', tableRow);
+    return tr;
+  };
 
-    // Добавляем номер строки в таблице
-    currentGoods.querySelector('td').textContent = nextRowNumber;
-    nextRowNumber += 1;
+const addGoods = (goods) => {
+  const addGoodsToDB = (goods) => {
+    dataBase.push(goods);
+  };
 
-    tableBody.append(currentGoods);
-  }
-};
+  const addGoodsToPage = (goods) => {
+    const nextRowNumber = tableBody.querySelectorAll('tr').length + 1;
+    const newGoods = createRow(goods);
 
-const openCloseModal = () => {
-  overlay.classList.remove('active');
+    newGoods.querySelector('td').textContent = nextRowNumber;
+    tableBody.append(newGoods);
+  };
 
-  btnAddGoods.addEventListener('click', () => {
-    overlay.classList.add('active');
-  });
-
-  overlay.addEventListener('click', e => {
-    const target = e.target;
-
-    if (target.matches('.overlay') ||
-        target.closest('.modal__close')) {
-      overlay.classList.remove('active');
-    }
-  });
+  addGoodsToDB(goods);
+  addGoodsToPage(goods);
+  console.log('DB: ', dataBase);
 };
 
 const deleteGoods = () => {
@@ -139,21 +108,127 @@ const deleteGoods = () => {
       const goodsId = +currentGoods.
         querySelector('.table__cell-id').
         parentElement.dataset.id;
-      const goodsIndexInDB = arr.findIndex(goods => goods.id === goodsId);
+
+      const goodsIndexInDB = dataBase.findIndex(goods => goods.id === goodsId);
 
       if (goodsIndexInDB >= 0) {
-        arr.splice(goodsIndexInDB, 1);
+        dataBase.splice(goodsIndexInDB, 1);
       }
 
       currentGoods.remove();
-      console.table('DB: ', arr);
+      console.table('DB: ', dataBase);
     }
   });
 };
 
+const modalSetTotalPrice = () => {
+  const totalPriceField = modalForm.total;
+  const count = modalForm.count;
+  const price = modalForm.price;
+  const discount = modalForm.discount_count;
+  const discountCheckbox = modalForm.discount;
+
+  const setTotalPrice = () => {
+    const discountCount = discount.value ? discount.value : 0;
+
+    const totalPrice =
+      (price.value * count.value * (1 - (discountCount / 100)).
+        toFixed(2));
+
+    totalPriceField.textContent = `$ ${totalPrice}`;
+  };
+
+  count.addEventListener('blur', setTotalPrice);
+  price.addEventListener('blur', setTotalPrice);
+  discount.addEventListener('blur', setTotalPrice);
+  discountCheckbox.addEventListener('click', setTotalPrice);
+};
+
+const countTotalPricePage = () => {
+  const prices = [...tableBody.querySelectorAll('td:nth-child(7)')].
+    map(price => +price.textContent.slice(1));
+
+  const totalPricePage = prices.reduce((prevPrice, currPrice) =>
+    prevPrice + currPrice).toFixed(2);
+
+  totalPrice.textContent = `$ ${totalPricePage}`;
+};
+
+const modalControlDiscount = () => {
+  const modalUnlockDiscount = () => {
+    discountField.disabled = false;
+  };
+
+  const modalLockDiscount = () => {
+    discountField.disabled = true;
+    discountField.value = '';
+  };
+
+  modalDiscountCheckbox.addEventListener('click', () => {
+    if (discountField.disabled) {
+      modalUnlockDiscount();
+      console.log('unlocked');
+    } else {
+      modalLockDiscount();
+      console.log('locked');
+    }
+  });
+};
+
+const modalControl = () => {
+  const modalOpen = () => {
+    overlay.classList.add('active');
+    newGoodsId.textContent = generateId();
+    modalSetTotalPrice();
+    modalForm.total.textContent = '$ 0';
+  };
+
+  const modalClose = () => {
+    discountField.disabled = true;
+    console.log('locked', discountField.disabled);
+    modalForm.reset();
+    overlay.classList.remove('active');
+    countTotalPricePage();
+  };
+
+  modalClose();
+
+  btnAddGoods.addEventListener('click', () => {
+    modalOpen();
+  });
+
+  overlay.addEventListener('click', e => {
+    const target = e.target;
+
+    if (target.matches('.overlay') ||
+        target.closest('.modal__close')) {
+      modalClose();
+    }
+  });
+
+  return modalClose;
+};
+
+const modalAddGoods = (modalClose) => {
+  modalForm.addEventListener('submit', e => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+
+    const newGoods = Object.fromEntries(formData);
+    newGoods.id = +newGoodsId.textContent;
+
+    addGoods(newGoods);
+    modalClose();
+  });
+};
+
 const init = () => {
-  renderGoods(arr);
-  openCloseModal();
+  const modalClose = modalControl();
+
+  modalConfigFields();
+  modalControlDiscount();
+  modalAddGoods(modalClose);
   deleteGoods();
 };
 
