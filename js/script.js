@@ -1,21 +1,5 @@
 'use strict';
 
-// const renderGoods = (goodsArr) => {
-//   const tableBody = document.querySelector('.table__body');
-
-//   let nextRowNumber = tableBody.querySelectorAll('tr').length + 1;
-
-//   for (const goods of goodsArr) {
-//     const currentGoods = createRow(goods);
-
-//     // Добавляем номер строки в таблице
-//     currentGoods.querySelector('td').textContent = nextRowNumber;
-//     nextRowNumber += 1;
-
-//     tableBody.append(currentGoods);
-//   }
-// };
-
 const dataBase = [];
 
 const overlay = document.querySelector('.overlay');
@@ -179,13 +163,11 @@ const modalControl = () => {
   const modalOpen = () => {
     overlay.classList.add('active');
     newGoodsId.textContent = generateId();
-    modalSetTotalPrice();
     modalForm.total.textContent = '$ 0';
   };
 
   const modalClose = () => {
     discountField.disabled = true;
-    console.log('locked', discountField.disabled);
     modalForm.reset();
     overlay.classList.remove('active');
     countTotalPricePage();
@@ -228,6 +210,7 @@ const init = () => {
 
   modalConfigFields();
   modalControlDiscount();
+  modalSetTotalPrice();
   modalAddGoods(modalClose);
   deleteGoods();
 };
