@@ -4,7 +4,6 @@ import {tableBody} from './htmlElements.js';
 
 import {
   renderTotalPricePage,
-  countTotalPricePage,
 } from './totalPrice.js';
 
 import {

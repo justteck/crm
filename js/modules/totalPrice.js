@@ -35,7 +35,6 @@ const countTotalPricePage = (dataBase) => {
   }).
     reduce((prevPrice, currPrice) => prevPrice + currPrice, 0).
     toFixed(2);
-  console.log('price: ', price);
   return price;
 };
 
