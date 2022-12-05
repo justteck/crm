@@ -55,8 +55,31 @@ const deleteGoods = () => {
   });
 };
 
+const showGoodsPhoto = () => {
+  tableBody.addEventListener('click', e => {
+    const target = e.target;
+
+    if (target.matches('.table__btn_pic')) {
+      const picLink = target.dataset.pic;
+      console.log('picLink: ', picLink);
+
+      const left = screen.width / 2 - 400;
+      const top = screen.height / 2 - 300;
+
+      const params = `
+        width=800,
+        height=600,
+        left=${left},
+        top=${top}`;
+
+      open(picLink, 'doggy', params);
+    }
+  });
+};
+
 export {
   addGoodsToDB,
   addGoods,
   deleteGoods,
+  showGoodsPhoto,
 };

@@ -15,7 +15,10 @@ import {
   renderGoodsIndex,
 } from './modules/renderGoods.js';
 
-import {deleteGoods} from './modules/controlGoods.js';
+import {
+  deleteGoods,
+  showGoodsPhoto,
+} from './modules/controlGoods.js';
 
 // Config inputs
 const modalConfigFields = () => {
@@ -44,6 +47,7 @@ const init = () => {
 
   modalAddGoods();
   deleteGoods();
+  showGoodsPhoto();
 };
 
 init();

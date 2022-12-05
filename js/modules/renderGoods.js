@@ -25,8 +25,10 @@ const createRow =
       <td class="table__cell">$${resultPrice}</td>
       <td class="table__cell">$${count * resultPrice}</td>
       <td class="table__cell table__cell_btn-wrapper">
-        <button class="table__btn table__btn_pic"></button>
-        <button class="table__btn table__btn_edit"></button>
+        <button class="table__btn table__btn_pic" 
+        data-pic="/img/test-pic.jpg"></button>
+        <button class="table__btn table__btn_edit"
+        data-pic="/img/test-pic.jpg"></button>
         <button class="table__btn table__btn_del"></button>
       </td>
     `;
