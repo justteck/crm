@@ -47,7 +47,7 @@ const init = () => {
 
   modalAddGoods();
   deleteGoods();
-  showGoodsPhoto();
+  showGoodsPhoto(800, 600);
 };
 
 init();
