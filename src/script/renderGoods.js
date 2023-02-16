@@ -1,16 +1,17 @@
-import {tableBody} from './htmlElements.js';
+import {tableBody} from './htmlElements';
 
-// Create ROW
+// Create table row
 const createRow =
   ({id,
-    name: title,
+    title,
     category,
     units,
     count,
     price,
-    discount_count: discountCount = 0}) => {
+    discount = 0,
+    image}) => {
     const tr = document.createElement('tr');
-    const resultDiscount = 1 - (discountCount / 100);
+    const resultDiscount = 1 - (discount / 100);
     const resultPrice = (price * resultDiscount).toFixed(2);
     const tableRow = `
       <td class="table__cell"></td>
@@ -23,10 +24,10 @@ const createRow =
       <td class="table__cell">${units}</td>
       <td class="table__cell">${count}</td>
       <td class="table__cell">$${resultPrice}</td>
-      <td class="table__cell">$${count * resultPrice}</td>
+      <td class="table__cell">$${(count * resultPrice).toFixed(2)}</td>
       <td class="table__cell table__cell_btn-wrapper">
         <button class="table__btn table__btn_pic" 
-        data-pic="/img/test-pic.jpg"></button>
+        data-pic="https://skitter-spectrum-bath.glitch.me/${image}"></button>
         <button class="table__btn table__btn_edit"
         data-pic="/img/test-pic.jpg"></button>
         <button class="table__btn table__btn_del"></button>

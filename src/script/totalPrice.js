@@ -5,8 +5,9 @@ import {
   modalTotalPrice,
   modalDiscountCheckbox,
   totalPrice,
-} from './htmlElements.js';
+} from './htmlElements';
 
+// count goods price in modal window
 const countTotalPriceModal = () => {
   const discountCount = modalDiscountField.value ? modalDiscountField.value : 0;
   const totalPrice =
@@ -16,7 +17,8 @@ const countTotalPriceModal = () => {
   return totalPrice;
 };
 
-const renderTotalPriceModal = () => {
+// render goods price in modal window
+const modalRenderTotalPrice = () => {
   const render = () => {
     modalTotalPrice.textContent = `$ ${countTotalPriceModal()}`;
   };
@@ -27,10 +29,10 @@ const renderTotalPriceModal = () => {
   modalDiscountCheckbox.addEventListener('click', () => render());
 };
 
+// count total price of all goods
 const countTotalPricePage = (dataBase) => {
-  console.log('DB', dataBase);
   const price = +dataBase.map(goods => {
-    const discount = goods['discount_count'] ?? 0;
+    const discount = goods['discount'] ?? 0;
     return (+goods.price) * (+goods.count) * (1 - (discount / 100));
   }).
     reduce((prevPrice, currPrice) => prevPrice + currPrice, 0).
@@ -38,12 +40,13 @@ const countTotalPricePage = (dataBase) => {
   return price;
 };
 
+// render total price of all goods
 const renderTotalPricePage = (dataBase) => {
   totalPrice.textContent = `$ ${countTotalPricePage(dataBase)}`;
 };
 
 export {
-  renderTotalPriceModal,
+  modalRenderTotalPrice,
   countTotalPriceModal,
   renderTotalPricePage,
   countTotalPricePage,

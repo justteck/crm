@@ -1,24 +1,30 @@
-import {dataBase} from './modules/database.js';
+import {modalForm} from './script/htmlElements';
 
-import {modalForm} from './modules/htmlElements.js';
-
-import {renderTotalPriceModal} from './modules/totalPrice.js';
+import {modalRenderTotalPrice} from './script/totalPrice';
 
 import {
   modalControl,
   modalControlDiscount,
   modalAddGoods,
-} from './modules/modalControls.js';
+  modalShowPhoto,
+} from './script/modalControls';
 
 import {
   renderGoods,
   renderGoodsIndex,
-} from './modules/renderGoods.js';
+} from './script/renderGoods';
 
 import {
   deleteGoods,
   showGoodsPhoto,
-} from './modules/controlGoods.js';
+} from './script/controlGoods';
+
+import {getGoods} from './script/getGoods';
+
+import {modalEditOpen} from './script/edirControl';
+
+import './index.html';
+import './css/index.css';
 
 // Config inputs
 const modalConfigFields = () => {
@@ -30,23 +36,25 @@ const modalConfigFields = () => {
     }
   }
 
-  elements.discount_count.type = 'number';
+  elements.discount.type = 'number';
   elements.count.type = 'number';
   elements.price.type = 'number';
 };
 
-const init = () => {
+const init = async () => {
   modalConfigFields();
-
-  renderGoods(dataBase);
-  renderGoodsIndex();
-
   modalControl();
   modalControlDiscount();
-  renderTotalPriceModal();
+  modalShowPhoto();
+  modalRenderTotalPrice();
+  modalEditOpen();
+
+  renderGoods(await getGoods('https://skitter-spectrum-bath.glitch.me/api/goods'));
+  renderGoodsIndex();
 
   modalAddGoods();
   deleteGoods();
+
   showGoodsPhoto(800, 600);
 };
 

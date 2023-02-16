@@ -75,6 +75,17 @@
   max-width: 580px;
 }
 
+.modal__photo {
+  margin-bottom: 28px;
+  background: #FFFFFF;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 18px;
+  max-width: 580px;
+  max-height: 250px;
+  text-align: center;
+}
+
 
 .modal__label {
   display: block;

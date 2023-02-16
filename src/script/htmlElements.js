@@ -2,11 +2,12 @@ const overlay = document.querySelector('.overlay');
 
 const modalForm = document.querySelector('.modal__form');
 const newGoodsId = document.querySelector('.vendor-code__id');
-const modalDiscountCheckbox = modalForm.discount;
-const modalDiscountField = modalForm.discount_count;
+const modalDiscountCheckbox = modalForm.discountCheckbox;
+const modalDiscountField = modalForm.discount;
 const modalCount = modalForm.count;
 const modalPrice = modalForm.price;
 const modalTotalPrice = modalForm.total;
+const modalFile = modalForm.image;
 
 const tableBody = document.querySelector('.table__body');
 const totalPrice = document.querySelector('.cms__total-price');
@@ -22,6 +23,7 @@ export {
   modalCount,
   modalPrice,
   modalTotalPrice,
+  modalFile,
   tableBody,
   totalPrice,
   btnAddGoods,
