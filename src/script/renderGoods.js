@@ -1,4 +1,5 @@
 import {tableBody} from './htmlElements';
+import {renderTotalPricePage} from './totalPrice';
 
 // Create table row
 const createRow =
@@ -51,8 +52,15 @@ const renderGoods = (goodsArr) => {
   tableBody.append(...rows);
 };
 
+const renderGoodsTable = (dataBase) => {
+  renderGoods(dataBase);
+  renderGoodsIndex();
+  renderTotalPricePage(dataBase);
+};
+
 export {
   createRow,
   renderGoodsIndex,
   renderGoods,
+  renderGoodsTable,
 };

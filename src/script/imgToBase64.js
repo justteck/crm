@@ -1,5 +1,4 @@
 // conver to Base64
-
 export const toBase64 = file => new Promise((resolve, reject) => {
   const reader = new FileReader();
 

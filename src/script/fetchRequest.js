@@ -1,4 +1,12 @@
-// work with a server
+/* eslint-disable require-jsdoc */
+// custom error class
+class StatusError extends Error {
+  constructor(message, status) {
+    super(message);
+    this.name = 'StatusError';
+    this.responseStatus = status;
+  }
+}
 
 export const fetchRequest = async (url, {
   method = 'get',
@@ -18,12 +26,17 @@ export const fetchRequest = async (url, {
 
     if (response.ok) {
       const data = await response.json();
+
       if (callback) return callback(null, data);
       return data;
     }
 
-    throw new Error(`Ошибка ${response.status}: ${response.statusText}`);
+    throw new StatusError(
+      `Ошибка ${response.status}!`, response.status);
   } catch (err) {
+    console.log('Сообщение', err.message);
+    console.log('Ошибка', err.name);
+    console.log('Статус', err.responseStatus);
     callback(err);
     return false;
   }

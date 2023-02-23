@@ -1,4 +1,4 @@
-.overlay {
+.overlay, .overlay-error, .overlay-delete {
   display: none;
   position: fixed;
   justify-content: center;
@@ -11,12 +11,24 @@
   background: rgba(255, 255, 255, 0.8);
 }
 
+.overlay-error.active {
+  display: block;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.overlay-delete.active {
+  display: flex;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .overlay.active {
   display: flex;
 }
 
 .overlay__modal {
-  position: absolute;
+  position: relative;
   top: 0;
   right: 0;
   left: 0;

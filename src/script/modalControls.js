@@ -6,53 +6,82 @@ import {
   btnAddGoods,
   modalDiscountCheckbox,
   modalFile,
+  overlayError,
 } from './htmlElements';
 
-import {
-  renderTotalPricePage,
-} from './totalPrice';
+import {addGoods, editGoods} from './controlGoods';
 
-import {addGoods} from './controlGoods';
-
-import {renderGoods, renderGoodsIndex} from './renderGoods';
+import {renderGoodsTable} from './renderGoods';
 
 import {getGoods} from './getGoods';
 
 import {toBase64} from './imgToBase64';
 
-import {el, mount} from 'redom';
+import {el, mount, setChildren} from 'redom';
+import {apiURL} from '..';
+import {fetchRequest} from './fetchRequest';
+import {callbackGet} from './fetchCallbacks';
 
 // Generate goods ID
-const generateId = () => Date.now();
+const generateId = () => 'будет сгенерирован на сервере';
 
-// show photo preview
+// show goods category list
+const modalShowCategories = async () => {
+  // get category datalist element
+  const categoriesDatalist = document.querySelector('#category-list');
+
+  // get goods categories from API
+  const categoriesAPI = await fetchRequest(`https://skitter-spectrum-bath.glitch.me/api/category`, {
+    method: 'get',
+  });
+
+  // create array of category elements
+  const datalistOptions = categoriesAPI.map(category => el('option', {
+    value: `${category}`}));
+
+  // add to datalist
+  setChildren(categoriesDatalist, datalistOptions);
+};
+
+
+// create modal photo preview
+const createPhotoPreview = (src) => el('img', {
+  className: 'modal__photo-preview',
+  src: `${src}`,
+  alt: 'goods photo',
+  style: {
+    maxHeight: '200px',
+    borderRadius: '8px',
+  },
+});
+
+const createPhotoContainer = (photo) => el('div', {
+  className: 'modal__photo',
+  style: {
+    maxWidth: `${document.querySelector('.modal__form').offsetWidth}px`,
+  },
+}, [el('p', {
+  className: 'modal__label modal__text',
+}, 'Фото товара'), photo]);
+
+// show modal photo preview
 const modalShowPhoto = () => {
   modalFile.addEventListener('change', () => {
     // if photo size < 1 Mb
     if (modalFile.files[0].size < 1000000) {
       const imgSrc = URL.createObjectURL(modalFile.files[0]);
+      // create img
+      const photo = createPhotoPreview(imgSrc);
 
-      const goodsPhoto = el('img', {
-        src: `${imgSrc}`,
-        alt: 'goods',
-        style: {
-          maxHeight: '200px',
-          borderRadius: '8px',
-        },
-      });
+      // create container
+      const photoContainer = createPhotoContainer(photo);
 
-      const photoSection = el('div', {
-        className: 'modal__photo',
-        style: {
-          maxWidth: `${document.querySelector('.modal__form').offsetWidth}px`,
-        },
-      }, goodsPhoto);
-
-      // insert photo section after a fieldset
-      mount(modalForm, photoSection, modalForm.lastElementChild);
+      // insert photo section after fieldset
+      mount(modalForm, photoContainer, modalForm.lastElementChild);
       // delete error section
       document.querySelector('.modal__photo_error')?.remove();
     } else { // if photo size > 1 Mb
+      // create error message
       const message = el('p', {
         style: {
           color: 'red',
@@ -60,7 +89,8 @@ const modalShowPhoto = () => {
         },
       }, 'Размер изображения не должен превышать 1 МБ');
 
-      const errorSection = el('div', {
+      // create error section
+      const errorContainer = el('div', {
         className: 'modal__photo_error',
         style: {
           maxWidth: `${document.querySelector('.modal__input').offsetWidth}px`,
@@ -68,7 +98,7 @@ const modalShowPhoto = () => {
       }, message);
 
       // add error message
-      mount(document.querySelector('fieldset'), errorSection);
+      mount(document.querySelector('fieldset'), errorContainer);
       // delete photo section
       document.querySelector('.modal__photo')?.remove();
     }
@@ -81,20 +111,24 @@ const modalOpen = () => {
   overlay.classList.add('active');
   newGoodsId.textContent = generateId();
   modalForm.total.textContent = '$ 0';
+
+  modalShowCategories();
 };
 
-const modalClose = async () => {
-  modalDiscountField.disabled = true;
-  modalForm.reset();
+const modalClose = () => {
+  modalDiscountField.disabled = true; // disable discount field
+
   document.querySelector('.modal__photo')?.remove(); // remove photo preview
   document.querySelector('.modal__photo_error')?.
-    remove(); // remove error message
-  overlay.classList.remove('active');
+    remove(); // remove photo error message
+  document.querySelector('.modal__error')?.
+    remove(); // remove post error message
 
-  const currentDB = await getGoods('https://skitter-spectrum-bath.glitch.me/api/goods');
-  renderTotalPricePage(currentDB);
-  renderGoods(currentDB);
-  renderGoodsIndex();
+  // reset modal mode (add goods/ edit goods)
+  overlay.dataset.mode = '';
+
+  modalForm.reset();
+  overlay.classList.remove('active');
 };
 
 // enable/disable discount checkbox
@@ -135,6 +169,13 @@ const modalControl = () => {
       modalClose();
     }
   });
+
+  overlayError.addEventListener('click', ({target}) => {
+    if (target.matches('.overlay-error') ||
+    target.closest('.modal-error__close-btn')) {
+      document.querySelector('.overlay-error').classList.remove('active');
+    }
+  });
 };
 
 const modalAddGoods = () => {
@@ -144,14 +185,24 @@ const modalAddGoods = () => {
     const formData = new FormData(e.target);
 
     const newGoods = Object.fromEntries(formData);
-    newGoods.id = +newGoodsId.textContent;
-    console.log(newGoods);
 
     const imgBase64 = await toBase64(newGoods.image);
     newGoods.image = imgBase64;
 
-    await addGoods(newGoods);
-    modalClose();
+    // check modal mode (edit goods / add goods)
+    if (modalForm.dataset.mode === 'edit') {
+      // get id
+      newGoods.id = newGoodsId.textContent;
+
+      if (await editGoods(newGoods)) { // if edited successfully
+        renderGoodsTable(await getGoods(apiURL, callbackGet));
+        modalClose();
+      }
+    } else {
+      await addGoods(newGoods);
+      renderGoodsTable(await getGoods(apiURL, callbackGet));
+      modalClose();
+    }
   });
 };
 
@@ -161,4 +212,6 @@ export {
   modalControlDiscount,
   modalAddGoods,
   modalShowPhoto,
+  createPhotoPreview,
+  createPhotoContainer,
 };

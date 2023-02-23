@@ -1,4 +1,6 @@
 const overlay = document.querySelector('.overlay');
+const overlayError = document.querySelector('.overlay-error');
+const overlayDelete = document.querySelector('.overlay-delete');
 
 const modalForm = document.querySelector('.modal__form');
 const newGoodsId = document.querySelector('.vendor-code__id');
@@ -27,4 +29,6 @@ export {
   tableBody,
   totalPrice,
   btnAddGoods,
+  overlayError,
+  overlayDelete,
 };

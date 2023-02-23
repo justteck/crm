@@ -98,9 +98,25 @@
     </div>
   </section>
 
-
   <div class="overlay active">
     <div class="overlay__modal modal">
+      <div class="overlay-error">
+        <div class="modal-error">
+          <div class="modal-error__close">
+            <button class="modal-error__close-btn">
+              <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="m2 2 20 20M2 22 22 2" stroke="currentColor" stroke-width="3" stroke-linecap="round" /></svg>
+            </button>
+          </div>
+          <div>
+            <div class="modal-error__cross">
+              <img src="./img/cross.svg" alt="crossed lines">
+            </div>
+            <p class="modal__label">Что-то пошло не так</p>
+          </div>
+        </div>
+      </div>
+
       <button class="modal__close">
         <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="m2 2 20 20M2 22 22 2" stroke="currentColor" stroke-width="3" stroke-linecap="round" /></svg>
@@ -124,7 +140,7 @@
 
           <label class="modal__label modal__label_category" for="category">
             <span class="modal__text">Категория</span>
-            <input class="modal__input" type="text" name="category" id="category">
+            <input class="modal__input" type="text" name="category" id="category" list="category-list">
           </label>
 
           <label class="modal__label modal__label_description" for="description">
@@ -171,6 +187,15 @@
     </div>
   </div>
 
+  <div class="overlay-delete">
+    <div class="modal-delete">
+      <p class="modal__label">Удалить товар?</p>
+      <div class="modal-delete__buttons">
+        <button class="modal__submit modal__submit_yes" type="button" >Да</button>
+        <button class="modal__submit modal__submit_no" type="button">Нет</button>
+      </div>
+    </div>
+  </div>
 
 </body>
 
