@@ -17,15 +17,41 @@ import {
   createPhotoContainer,
   createPhotoPreview,
 } from './modalControls';
+import {modalShowCategories} from './modalControls';
+import {preloaderStart, preloaderStop} from './preloader';
+
+// check attached photo (modal edit)
+const modalIsPhotoAttached = (base64img) => {
+  if (base64img.length <= 5) { // no attached photo (base64img === 'data:')
+    return false;
+  }
+  return true;
+};
+
+// load photo preview
+const loadImage = (img) => new Promise((resolve, reject) => {
+  img.addEventListener('load', () => {
+    resolve(img);
+  });
+
+  img.addEventListener('error', () => {
+    reject(new Error('Error! Photo was not loaded'));
+  });
+});
 
 const modalEditOpen = () => {
   tableBody.addEventListener('click', async e => {
     const target = e.target;
 
-    if (target.matches('.table__btn_edit')) {
+    if (target.matches('.table__btn_edit')) { // edit btn is clicked
+      preloaderStart(); // show preloader
+
       // change modal title
       overlay.querySelector('.modal__title').textContent =
           'Редактировать товар';
+      overlay.querySelector('.modal__label_file').textContent =
+          'Изменить изображение';
+
       // set current modal mode
       modalForm.dataset.mode = 'edit';
 
@@ -53,7 +79,10 @@ const modalEditOpen = () => {
           method: 'get',
         });
 
-      // render goods data inside the form
+      // load goods categories
+      modalShowCategories();
+
+      // set goods data
       newGoodsId.textContent = id;
       modalForm.title.value = title;
       modalForm.description.value = description;
@@ -62,8 +91,8 @@ const modalEditOpen = () => {
       modalPrice.value = price;
       modalForm.units.value = units;
       modalForm.image.filename = image;
-      console.log('image.value: ', image);
 
+      // set discount
       if (discount === 0) {
         modalDiscountField.disabled = true;
       } else {
@@ -72,62 +101,30 @@ const modalEditOpen = () => {
         modalDiscountField.value = discount;
       }
 
-      const imgSrc = `https://skitter-spectrum-bath.glitch.me/${image}`;
+      // load photo
+      if (image !== 'image/notimage.jpg') { // if goods photo exists
+        const photoSrc = `https://skitter-spectrum-bath.glitch.me/${image}`;
 
-      const loadPhoto = () => new Promise(resolve => {
-        // создать img
-        // const photo = createPhotoPreview(imgSrc);
-        const photo = new Image();
-        photo.src = imgSrc;
-        // создать контейнер с фото
-        // const photoContainer = createPhotoContainer(photo);
-        // // добавить на страницу
-        // document.querySelector('.modal__fieldset').
-        //   insertAdjacentElement('afterend', photoContainer);
+        const photo = createPhotoPreview(photoSrc);
 
-        // // рендер цены
-        // modalTotalPrice.textContent = `$ ${countTotalPriceModal()}`;
+        const photoLoaded = await loadImage(photo);
 
-        // photo.addEventListener('load', () => {
-        //   resolve();
-        // });
+        const photoContainer = createPhotoContainer(photoLoaded);
 
-        photo.onload = resolve(photo);
-      });
-
-      const x = loadPhoto();
-      x.then(photo => {
-        // создать контейнер с фото
-        const photoContainer = createPhotoContainer(photo);
-        // добавить на страницу
         document.querySelector('.modal__fieldset').
           insertAdjacentElement('afterend', photoContainer);
+      }
 
-        // рендер цены
-        modalTotalPrice.textContent = `$ ${countTotalPriceModal()}`;
-
-        overlay.classList.add('active');
-      });
-
-      // // создать img
-      // const photo = createPhotoPreview(imgSrc);
-
-      // photo.addEventListener('load', () => {
-      //   // создать контейнер с фото
-      //   const photoContainer = createPhotoContainer(photo);
-      //   // добавить на страницу
-      //   document.querySelector('.modal__fieldset').
-      //     insertAdjacentElement('afterend', photoContainer);
-
-      //   // рендер цены
-      //   modalTotalPrice.textContent = `$ ${countTotalPriceModal()}`;
-      // });
-
-      // overlay.classList.add('active');
+      // render price
+      modalTotalPrice.textContent = `$ ${countTotalPriceModal()}`;
+      // open modal
+      overlay.classList.add('active');
+      preloaderStop(); // hide preloader
     }
   });
 };
 
 export {
   modalEditOpen,
+  modalIsPhotoAttached,
 };

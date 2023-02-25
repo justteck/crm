@@ -1,5 +1,6 @@
 import {tableBody} from './htmlElements';
 import {renderTotalPricePage} from './totalPrice';
+import {el} from 'redom';
 
 // Create table row
 const createRow =
@@ -49,7 +50,27 @@ const renderGoodsIndex = () => {
 const renderGoods = (goodsArr) => {
   const rows = goodsArr.map((goods, index) => createRow(goods, index + 1));
   tableBody.innerHTML = '';
-  tableBody.append(...rows);
+
+  if (rows.length === 0) { // if goods array is empty
+    // remove no goods message if exists
+    document.querySelector('.no-goods')?.remove();
+
+    // add no goods message
+    document.querySelector('.goods__table-wrapper').append(el('div', {
+      className: 'no-goods',
+      style: {
+        fontSize: '15px',
+        padding: '20px',
+        textAlign: 'center',
+      },
+    }, 'Товары отсутствуют'));
+  } else {
+    // remove no goods message if exists
+    document.querySelector('.no-goods')?.remove();
+
+    // add goods
+    tableBody.append(...rows);
+  }
 };
 
 const renderGoodsTable = (dataBase) => {

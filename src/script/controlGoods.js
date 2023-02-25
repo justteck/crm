@@ -43,10 +43,11 @@ const addGoods = async goods => {
 // modal confirm delete goods
 const deleteGoods = (goods, id) => {
   const confirmDelete = async ({target}) => {
-    // if clicked 'yes'
+    // if clicked 'yes' in modal
     if (target.matches('.modal__submit_yes')) {
+      overlayDelete.classList.remove('active'); // close modal
+
       // delete from DB
-      console.log('VOT', `${apiURL}/${id}`);
       await fetchRequest(`${apiURL}/${id}`, {
         method: 'delete',
       });
@@ -55,10 +56,10 @@ const deleteGoods = (goods, id) => {
       renderGoodsIndex();
       renderTotalPricePage(await getGoods(apiURL, callbackGet));
 
-      overlayDelete.classList.remove('active'); // close modal
+      // if clicked 'no' / overlay
     } else if (target.matches('.modal__submit_no') ||
                 target.matches('.overlay-delete')) {
-      overlayDelete.classList.remove('active');
+      overlayDelete.classList.remove('active'); // close modal
     }
 
     overlayDelete.removeEventListener('click', confirmDelete);
@@ -67,12 +68,17 @@ const deleteGoods = (goods, id) => {
   overlayDelete.addEventListener('click', confirmDelete);
 };
 
-// control delete goods
-const controlDeleteGoods = (target) => {
-  const currentGoods = target.closest('tr');
-  const goodsId = currentGoods.
+// select delete goods
+const selectDeleteGoods = (target) => {
+  const currentGoods = target.closest('tr'); // goods to delete
+  const goodsId = currentGoods. // goods id
     querySelector('.table__cell-id').
     parentElement.dataset.id;
+
+  // set goods title in modal
+  const goodsTitle =
+    currentGoods.querySelector('.table__cell_name').textContent;
+  document.querySelector('.modal-delete__goods').textContent = goodsTitle;
 
   deleteGoods(currentGoods, goodsId);
 };
@@ -80,9 +86,9 @@ const controlDeleteGoods = (target) => {
 // render delete confirmation
 const renderDeleteModal = () => {
   tableBody.addEventListener('click', ({target}) => {
-    if (target.matches('.table__btn_del')) {
+    if (target.matches('.table__btn_del')) { // if edit btn clicked
       overlayDelete.classList.add('active');
-      controlDeleteGoods(target);
+      selectDeleteGoods(target);
     }
   });
 };
@@ -137,7 +143,6 @@ const showGoodsPhoto = (picWidth, picHeight) => {
 
 export {
   addGoods,
-  // deleteGoods,
   editGoods,
   showGoodsPhoto,
   renderDeleteModal,

@@ -20,7 +20,8 @@
 .overlay-delete.active {
   display: flex;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.1);
+  /* Добавляем затемнение */
+  background: rgba(18,18,18,0.64);
 }
 
 .overlay.active {

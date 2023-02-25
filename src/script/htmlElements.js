@@ -16,6 +16,8 @@ const totalPrice = document.querySelector('.cms__total-price');
 
 const btnAddGoods = document.querySelector('.panel__add-goods');
 
+const inputSearch = document.querySelector('.panel__input');
+
 export {
   overlay,
   modalForm,
@@ -31,4 +33,5 @@ export {
   btnAddGoods,
   overlayError,
   overlayDelete,
+  inputSearch,
 };

@@ -23,6 +23,7 @@ const modalRenderTotalPrice = () => {
     modalTotalPrice.textContent = `$ ${countTotalPriceModal()}`;
   };
 
+  // render total price
   modalCount.addEventListener('blur', () => render());
   modalPrice.addEventListener('blur', () => render());
   modalDiscountField.addEventListener('blur', () => render());

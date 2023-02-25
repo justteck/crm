@@ -21,6 +21,7 @@ import {el, mount, setChildren} from 'redom';
 import {apiURL} from '..';
 import {fetchRequest} from './fetchRequest';
 import {callbackGet} from './fetchCallbacks';
+import {modalIsPhotoAttached} from './editControl';
 
 // Generate goods ID
 const generateId = () => 'будет сгенерирован на сервере';
@@ -43,7 +44,6 @@ const modalShowCategories = async () => {
   setChildren(categoriesDatalist, datalistOptions);
 };
 
-
 // create modal photo preview
 const createPhotoPreview = (src) => el('img', {
   className: 'modal__photo-preview',
@@ -55,11 +55,9 @@ const createPhotoPreview = (src) => el('img', {
   },
 });
 
+// create modal photo container
 const createPhotoContainer = (photo) => el('div', {
   className: 'modal__photo',
-  style: {
-    maxWidth: `${document.querySelector('.modal__form').offsetWidth}px`,
-  },
 }, [el('p', {
   className: 'modal__label modal__text',
 }, 'Фото товара'), photo]);
@@ -76,10 +74,14 @@ const modalShowPhoto = () => {
       // create container
       const photoContainer = createPhotoContainer(photo);
 
+      // delete error section if exists
+      document.querySelector('.modal__photo_error')?.remove();
+
+      // delete photo section if exists
+      document.querySelector('.modal__photo')?.remove();
+
       // insert photo section after fieldset
       mount(modalForm, photoContainer, modalForm.lastElementChild);
-      // delete error section
-      document.querySelector('.modal__photo_error')?.remove();
     } else { // if photo size > 1 Mb
       // create error message
       const message = el('p', {
@@ -108,6 +110,8 @@ const modalShowPhoto = () => {
 // Controls
 const modalOpen = () => {
   overlay.querySelector('.modal__title').textContent = 'Добавить товар';
+  overlay.querySelector('.modal__label_file').textContent =
+    'Добавить изображение';
   overlay.classList.add('active');
   newGoodsId.textContent = generateId();
   modalForm.total.textContent = '$ 0';
@@ -115,6 +119,7 @@ const modalOpen = () => {
   modalShowCategories();
 };
 
+// modal close
 const modalClose = () => {
   modalDiscountField.disabled = true; // disable discount field
 
@@ -178,6 +183,7 @@ const modalControl = () => {
   });
 };
 
+// actions after submit
 const modalAddGoods = () => {
   modalForm.addEventListener('submit', async e => {
     e.preventDefault();
@@ -190,15 +196,18 @@ const modalAddGoods = () => {
     newGoods.image = imgBase64;
 
     // check modal mode (edit goods / add goods)
-    if (modalForm.dataset.mode === 'edit') {
+    if (modalForm.dataset.mode === 'edit') { // if mode is "edit goods"
       // get id
       newGoods.id = newGoodsId.textContent;
+
+      // if no photo attached
+      if (!modalIsPhotoAttached(imgBase64)) delete newGoods.image;
 
       if (await editGoods(newGoods)) { // if edited successfully
         renderGoodsTable(await getGoods(apiURL, callbackGet));
         modalClose();
       }
-    } else {
+    } else { // if mode is "add goods"
       await addGoods(newGoods);
       renderGoodsTable(await getGoods(apiURL, callbackGet));
       modalClose();
@@ -214,4 +223,5 @@ export {
   modalShowPhoto,
   createPhotoPreview,
   createPhotoContainer,
+  modalShowCategories,
 };

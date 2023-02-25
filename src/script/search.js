@@ -1,10 +1,10 @@
 import {getGoods} from './getGoods';
 import {apiURL} from '..';
-import { renderGoodsTable } from './renderGoods';
+import {renderGoodsTable} from './renderGoods';
+import {callbackGet} from './fetchCallbacks';
+import {inputSearch} from './htmlElements';
 
-// search
-const inputSearch = document.querySelector('.panel__input');
-
+// delay search
 const debounce = (func, delayTime) => {
   let timeout;
   return function doWithDelay() {
@@ -13,16 +13,20 @@ const debounce = (func, delayTime) => {
   };
 };
 
+// search
 const searchGoods = async () => {
+  // current search query
   const currentQuery = inputSearch.value;
 
-  const searchResults = await getGoods(`${apiURL}?search=${currentQuery}`);
+  // get goods from api
+  const searchResults =
+    await getGoods(`${apiURL}?search=${currentQuery}`, callbackGet);
+
+  // render
   renderGoodsTable(searchResults);
 };
 
 const searchDebounce = debounce(searchGoods, 300);
-
-inputSearch.addEventListener('input', searchDebounce);
 
 export {
   searchDebounce,

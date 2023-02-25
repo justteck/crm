@@ -1,4 +1,6 @@
-import {modalForm} from './script/htmlElements';
+import {
+  inputSearch,
+} from './script/htmlElements';
 import {modalRenderTotalPrice} from './script/totalPrice';
 import {
   modalControl,
@@ -10,60 +12,44 @@ import {
   renderGoodsTable,
 } from './script/renderGoods';
 import {
-  // deleteGoods,
   renderDeleteModal,
   showGoodsPhoto,
 } from './script/controlGoods';
 import {modalEditOpen} from './script/editControl';
 import './index.html';
 import './css/index.css';
-import {el} from 'redom';
+import {modalConfigFields} from './script/defaultInputs';
 import {getGoods} from './script/getGoods';
 import {callbackGet} from './script/fetchCallbacks';
 import {searchDebounce} from './script/search';
+import {preloaderStart, preloaderStop} from './script/preloader';
 
 // api URL
 export const apiURL = 'https://skitter-spectrum-bath.glitch.me/api/goods';
 
-// Config inputs
-const modalConfigFields = () => {
-  const elements = modalForm.firstElementChild.elements;
-
-  for (const element of elements) {
-    if (element.type !== 'checkbox' && element.type !== 'file') {
-      element.required = true;
-    }
-  }
-
-  elements.discount.type = 'number';
-  elements.count.type = 'number';
-  elements.price.type = 'number';
-
-  // create categories datalist
-  const categories = el('datalist', {
-    id: 'category-list',
-  });
-  document.querySelector('.modal__label_category').
-    insertAdjacentElement('afterend', categories);
-};
-
 const init = async () => {
-  renderGoodsTable(await getGoods(apiURL, callbackGet));
+  preloaderStart(); // show preloader
 
-  modalConfigFields();
+  modalConfigFields(); // config inputs by default
+
+  // modal controls
   modalControl();
   modalControlDiscount();
   modalShowPhoto();
   modalRenderTotalPrice();
   modalAddGoods();
 
-  modalEditOpen();
+  renderGoodsTable(await getGoods(apiURL, callbackGet)); // render table
 
-  renderDeleteModal();
+  preloaderStop(); // stop preloader
 
-  showGoodsPhoto(800, 600);
+  modalEditOpen(); // open goods edit modal
 
-  searchDebounce();
+  renderDeleteModal(); // render delete confirmation
+
+  showGoodsPhoto(800, 600); // open goods photo
+
+  inputSearch.addEventListener('input', searchDebounce); // search
 };
 
 init();
