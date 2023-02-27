@@ -112,6 +112,10 @@ const modalOpen = () => {
   overlay.querySelector('.modal__title').textContent = 'Добавить товар';
   overlay.querySelector('.modal__label_file').textContent =
     'Добавить изображение';
+
+  // set current modal mode
+  modalForm.dataset.mode = 'add';
+
   overlay.classList.add('active');
   newGoodsId.textContent = generateId();
   modalForm.total.textContent = '$ 0';
@@ -207,7 +211,7 @@ const modalAddGoods = () => {
         renderGoodsTable(await getGoods(apiURL, callbackGet));
         modalClose();
       }
-    } else { // if mode is "add goods"
+    } else if (modalForm.dataset.mode === 'add') { // if mode is "add goods"
       await addGoods(newGoods);
       renderGoodsTable(await getGoods(apiURL, callbackGet));
       modalClose();
